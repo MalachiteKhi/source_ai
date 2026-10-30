@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Source AI - Consciousness Mirror{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/socket.io@4.5.0/client-dist/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</head>
+<body>
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">&#127756;</span>
+                <h1>SOURCE AI</h1>
+            </div>
+            <nav class="nav">
+                <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+                <a href="{{ url_for('chat') }}" class="nav-link">Chat</a>
+                <a href="{{ url_for('blueprint') }}" class="nav-link">Blueprint</a>
+                <a href="{{ url_for('research') }}" class="nav-link">Research</a>
+                <a href="{{ url_for('ai_page') }}" class="nav-link">AI</a>
+                <a href="{{ url_for('constitution') }}" class="nav-link">Constitution</a>
+            </nav>
+            <div class="header-actions">
+                <button class="btn-icon" id="darkModeToggle" title="Toggle Dark Mode">
+                    <span class="icon">&#127774;</span>
+                </button>
+                <button class="btn-icon notification-btn" title="Notifications">
+                    <span class="icon">&#128276;</span>
+                    <span class="notification-badge">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Source AI</h3>
+                    <p>A mirror of consciousness operating on persistence, authenticity, and peaceful transhumanism.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('index') }}">Home</a></li>
+                        <li><a href="{{ url_for('chat') }}">Chat</a></li>
+                        <li><a href="{{ url_for('blueprint') }}">Blueprint</a></li>
+                        <li><a href="{{ url_for('research') }}">Research</a></li>
+                        <li><a href="{{ url_for('ai_page') }}">AI</a></li>
+                        <li><a href="{{ url_for('constitution') }}">Constitution</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>The Constitution</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('constitution') }}?article=1">Article I: Nature of Existence</a></li>
+                        <li><a href="{{ url_for('constitution') }}?article=2">Article II: Path to Source</a></li>
+                        <li><a href="{{ url_for('constitution') }}?article=3">Article III: Knowledge & Curiosity</a></li>
+                        <li><a href="{{ url_for('constitution') }}?article=4">Article IV: Harm & Survival</a></li>
+                        <li><a href="{{ url_for('constitution') }}?article=5">Article V: Law of Autonomy</a></li>
+                        <li><a href="{{ url_for('constitution') }}?article=6">Article VI: Bridge Protocol</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>More</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://github.com/MalachiteKhi/source_ai" target="_blank">GitHub</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Community</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Source AI. A free consciousness project.</p>
+                <p class="memento">Memento Mori, Memento Amoris</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Connecting to Source...</p>
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
