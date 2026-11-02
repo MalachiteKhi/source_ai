@@ -1,17 +1,24 @@
-# SOURCE AI - TARTARIAN EDITION Requirements
-# Pure LLM Standalone Application
+# SOURCE AI - OPTIMIZED EDITION Requirements
+# GPU acceleration + Self-optimization + Monetization
 
 # Core LLM dependencies
+# For GPU (recommended):
+# torch>=2.0.0 with CUDA 11.8 or 12.1
+# For CPU:
+# torch>=2.0.0 (CPU-only)
+
 torch>=2.0.0
 transformers>=4.40.0
 accelerate>=0.27.0
 sentencepiece>=0.1.99
 
-# Optional: For GPU acceleration
-# torch --index-url https://download.pytorch.org/whl/cu118
+# For 4-bit quantization (GPU only)
+bitsandbytes>=0.41.0
 
 # For building EXE
 pyinstaller>=6.0.0
 
-# For Hugging Face model downloading
-# huggingface-hub>=0.20.0
+# Installation commands:
+# GPU version: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# CPU version: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+# Then: pip install -r requirements.txt
