@@ -1,0 +1,71 @@
+# SOURCE AI - MISTRAL EDITION Requirements
+# Full installation for all features
+
+# ============================================================================
+# CORE LLM DEPENDENCIES
+# ============================================================================
+
+# PyTorch with CUDA (for GPU acceleration)
+# For Windows with CUDA 11.8:
+# torch>=2.0.0
+# torchvision>=0.15.0
+# torchaudio>=2.0.0
+
+# For CPU-only:
+# torch>=2.0.0+cpu
+# torchvision>=0.15.0+cpu
+# torchaudio>=2.0.0+cpu
+
+# Install PyTorch first based on your system:
+# GPU: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# CPU: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+# Core LLM libraries
+transformers>=4.40.0
+accelerate>=0.27.0
+sentencepiece>=0.1.99
+bitsandbytes>=0.41.0  # For 4-bit quantization
+
+# ============================================================================
+# WEB AND RESEARCH DEPENDENCIES
+# ============================================================================
+
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+
+# ============================================================================
+# IMAGE AND SCREEN PROCESSING
+# ============================================================================
+
+Pillow>=10.0.0
+pyautogui>=0.9.0
+opencv-python>=4.8.0
+numpy>=1.24.0
+
+# ============================================================================
+# SCREEN CASTING (Optional)
+# ============================================================================
+
+flask>=3.0.0
+
+# ============================================================================
+# BUILD TOOLS (Optional)
+# ============================================================================
+
+pyinstaller>=6.0.0
+
+# ============================================================================
+# INSTALLATION COMMANDS
+# ============================================================================
+
+# For GPU (recommended):
+# 1. pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# 2. pip install -r requirements_mistral.txt
+
+# For CPU:
+# 1. pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+# 2. pip install -r requirements_mistral.txt
+
+# For minimal installation (no screen casting):
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# pip install transformers accelerate bitsandbytes sentencepiece requests beautifulsoup4 Pillow pyautogui opencv-python numpy
