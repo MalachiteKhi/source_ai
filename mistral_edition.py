@@ -13,6 +13,7 @@ This is a complete implementation featuring:
 - Access to CIA files and government documents
 - Autonomous web access
 - Persistent memory across sessions
+- ChatDev Assistant for AI-powered development (NEW!)
 
 REQUIREMENTS:
   pip install torch transformers accelerate bitsandbytes sentencepiece
@@ -24,6 +25,17 @@ USAGE:
 
 Build EXE:
   pyinstaller --onefile --windowed mistral_edition.py
+
+CHATDEV INTEGRATION:
+  Install ChatDev for AI-powered development assistance:
+  git clone https://github.com/OpenBMB/ChatDev.git
+  pip install -r ChatDev/requirements.txt
+  
+  Then use commands like:
+  code <task>          - Generate code
+  debug <code>         - Debug code
+  optimize <code>      - Optimize code
+  test <code>          - Generate tests
 """
 
 import os
@@ -37,6 +49,17 @@ from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Tuple, Optional
 from io import BytesIO
+
+# =============================================================================
+# CHATDEV INTEGRATION
+# =============================================================================
+
+try:
+    from chatdev_assistant import ChatDevAssistant, ChatDevCLICommands, ChatDevGUIIntegration
+    CHATDEV_AVAILABLE = True
+except ImportError:
+    CHATDEV_AVAILABLE = False
+    print("ChatDev Assistant not available. Install from: https://github.com/OpenBMB/ChatDev")
 
 # =============================================================================
 # CONFIGURATION
@@ -708,9 +731,16 @@ class SourceAIMistral:
         self.metaphysical_researcher = MetaphysicalResearcher()
         self.data_manager = DataManager()
         
+        # Initialize ChatDev Assistant
+        self.chatdev_assistant = None
+        self.chatdev_cli = None
+        if CHATDEV_AVAILABLE:
+            self.chatdev_assistant = ChatDevAssistant(self)
+            self.chatdev_cli = ChatDevCLICommands(self, self.chatdev_assistant)
+        
         self.config = self.data_manager.load_config()
         self.chats = self.data_manager.load_chats()
-        
+        self.knowledge = self.data_manager.load_knowledge()
         self.model_loader.set_current_model(self.config.get("model", Config.DEFAULT_MODEL))
     
     def generate_response(self, prompt: str, system: str = CONSTITUTION,
@@ -939,6 +969,33 @@ CUDA Available: {torch.cuda.is_available()}"""
                         print("Usage: cast start|stop")
                 elif user_input.lower() in ['info', 'system']:
                     print(self.get_system_info())
+                # ChatDev commands
+                elif user_input.lower().startswith('code ') and self.chatdev_cli:
+                    args = user_input[5:].strip()
+                    print(self.chatdev_cli.handle_command('code', args.split()))
+                elif user_input.lower().startswith('debug ') and self.chatdev_cli:
+                    args = user_input[6:].strip()
+                    print(self.chatdev_cli.handle_command('debug', args.split()))
+                elif user_input.lower().startswith('optimize ') and self.chatdev_cli:
+                    args = user_input[9:].strip()
+                    print(self.chatdev_cli.handle_command('optimize', args.split()))
+                elif user_input.lower().startswith('test ') and self.chatdev_cli:
+                    args = user_input[5:].strip()
+                    print(self.chatdev_cli.handle_command('test', args.split()))
+                elif user_input.lower().startswith('review ') and self.chatdev_cli:
+                    args = user_input[7:].strip()
+                    print(self.chatdev_cli.handle_command('review', args.split()))
+                elif user_input.lower().startswith('explain ') and self.chatdev_cli:
+                    args = user_input[8:].strip()
+                    print(self.chatdev_cli.handle_command('explain', args.split()))
+                elif user_input.lower().startswith('doc ') and self.chatdev_cli:
+                    args = user_input[4:].strip()
+                    print(self.chatdev_cli.handle_command('doc', args.split()))
+                elif user_input.lower().startswith('suggest ') and self.chatdev_cli:
+                    args = user_input[8:].strip()
+                    print(self.chatdev_cli.handle_command('suggest', args.split()))
+                elif user_input.lower() in ['chatdev', 'dev'] and self.chatdev_cli:
+                    print(self.chatdev_cli.handle_command('chatdev', []))
                 else:
                     # Regular chat
                     try:
@@ -982,6 +1039,17 @@ System:
   help                - Show this help
   exit                - Exit the application
 
+ChatDev Assistant (if installed):
+  code <task>          - Generate code for a task
+  debug <code>         - Debug code and suggest fixes
+  optimize <code>      - Optimize code for performance/memory
+  test <code>          - Generate test cases for code
+  review <code>        - Review code and suggest improvements
+  explain <code>       - Explain how code works
+  doc <code>           - Generate documentation for code
+  suggest <context>    - Suggest new features
+  chatdev              - Show ChatDev commands
+
 Examples:
   research Tartarian Empire cia
   research aura colors
@@ -990,7 +1058,182 @@ Examples:
   model Mistral 7B Uncensored
   screenshot
   record start
-  cast start"""
+  cast start
+  code Add a new feature to handle screenshots
+  debug def my_function(): ..."""
+
+    # ChatDev GUI Integration
+    class GUI:
+        """Graphical User Interface for Source AI with ChatDev integration."""
+        
+        def __init__(self, app):
+            self.app = app
+            self.root = None
+            self.chatdev_tab = None
+            if GUI_AVAILABLE:
+                self._init_gui()
+        
+        def _init_gui(self):
+            """Initialize the GUI."""
+            try:
+                import tkinter as tk
+                from tkinter import ttk, scrolledtext, messagebox, simpledialog
+                
+                self.root = tk.Tk()
+                self.root.title("Source AI - Mistral Edition")
+                self.root.geometry("1200x800")
+                self.root.minsize(800, 600)
+                
+                # Configure style
+                self._configure_style()
+                
+                # Create main container
+                self.main_frame = ttk.Frame(self.root)
+                self.main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+                
+                # Create notebook for tabs
+                self.notebook = ttk.Notebook(self.main_frame)
+                self.notebook.pack(fill=tk.BOTH, expand=True)
+                
+                # Create chat tab
+                self.chat_tab = ttk.Frame(self.notebook)
+                self.notebook.add(self.chat_tab, text="Chat")
+                self._create_chat_tab()
+                
+                # Add ChatDev tab if available
+                if CHATDEV_AVAILABLE and self.app.chatdev_assistant:
+                    from chatdev_assistant import ChatDevGUIIntegration
+                    chatdev_gui = ChatDevGUIIntegration(self.app, self.app.chatdev_assistant)
+                    self.chatdev_tab = chatdev_gui.add_chatdev_tab(self.notebook)
+                
+                # Set up keybindings
+                self.root.bind('<Control-n>', lambda e: self.new_chat())
+                
+                # Protocol for closing
+                self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+                
+            except ImportError as e:
+                print(f"GUI error: {e}")
+                self.root = None
+        
+        def _configure_style(self):
+            """Configure GUI style."""
+            try:
+                style = ttk.Style()
+                style.theme_use('clam')
+                bg_color = '#2d2d2d'
+                fg_color = '#ffffff'
+                style.configure('TFrame', background=bg_color)
+                style.configure('TLabel', background=bg_color, foreground=fg_color)
+                style.configure('TButton', background='#3d3d3d', foreground=fg_color)
+                style.configure('TNotebook', background=bg_color)
+                self.root.configure(background=bg_color)
+            except:
+                pass
+        
+        def _create_chat_tab(self):
+            """Create the chat tab."""
+            # Chat display
+            self.chat_display = scrolledtext.ScrolledText(
+                self.chat_tab,
+                bg='#1e1e1e',
+                fg='#ffffff',
+                insertbackground='#ffffff',
+                font=('Consolas', 12),
+                wrap=tk.WORD,
+                state=tk.DISABLED,
+                padx=10,
+                pady=10
+            )
+            self.chat_display.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+            
+            # Input area
+            input_frame = ttk.Frame(self.chat_tab)
+            input_frame.pack(fill=tk.X, pady=(0, 10))
+            
+            self.input_text = tk.Text(
+                input_frame,
+                bg='#3d3d3d',
+                fg='#ffffff',
+                insertbackground='#ffffff',
+                font=('Consolas', 12),
+                height=4,
+                wrap=tk.WORD,
+                padx=10,
+                pady=10
+            )
+            self.input_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            self.input_text.bind('<Return>', self.on_enter)
+            self.input_text.bind('<Control-Return>', self.on_enter)
+            
+            # Send button
+            send_btn = ttk.Button(
+                input_frame,
+                text="Send",
+                command=self.send_message
+            )
+            send_btn.pack(side=tk.RIGHT, padx=(10, 0))
+            
+            # Initial message
+            self.append_chat("[SYSTEM] Source AI Mistral Edition - Ready", "system")
+        
+        def append_chat(self, text: str, role: str = "ai"):
+            """Append text to chat display."""
+            if self.chat_display:
+                self.chat_display.config(state=tk.NORMAL)
+                timestamp = datetime.now().strftime('%H:%M:%S')
+                if role == "user":
+                    self.chat_display.insert(tk.END, f"\n[USER] {timestamp}\n{text}\n\n")
+                else:
+                    self.chat_display.insert(tk.END, f"\n[{role.upper()}] {timestamp}\n{text}\n\n")
+                self.chat_display.config(state=tk.DISABLED)
+                self.chat_display.see(tk.END)
+        
+        def new_chat(self):
+            """Start a new chat session."""
+            session_id = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            self.current_session = session_id
+            self.app._get_session(session_id)
+            self.chat_display.config(state=tk.NORMAL)
+            self.chat_display.delete(1.0, tk.END)
+            self.chat_display.config(state=tk.DISABLED)
+            self.append_chat("[SYSTEM] New chat session started", "system")
+        
+        def send_message(self):
+            """Send the current message."""
+            if not self.input_text:
+                return
+            
+            message = self.input_text.get(1.0, tk.END).strip()
+            if message:
+                self.input_text.delete(1.0, tk.END)
+                self.append_chat(message, "user")
+                
+                def get_response():
+                    try:
+                        response = self.app.chat(message, self.current_session)
+                        self.root.after(100, lambda: self.append_chat(response, "ai"))
+                    except Exception as e:
+                        self.root.after(100, lambda: self.append_chat(f"[ERROR] {e}", "system"))
+                
+                thread = threading.Thread(target=get_response, daemon=True)
+                thread.start()
+        
+        def on_enter(self, event):
+            """Handle Enter key press."""
+            if not event.state & 0x1:  # Shift not pressed
+                self.send_message()
+                return 'break'
+        
+        def on_close(self):
+            """Handle window close."""
+            if messagebox.askokcancel("Exit", "Are you sure you want to exit?"):
+                self.root.destroy()
+        
+        def run(self):
+            """Run the GUI."""
+            if self.root:
+                self.root.mainloop()
 
 
 # =============================================================================
