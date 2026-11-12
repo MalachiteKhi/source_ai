@@ -16,7 +16,7 @@ This is a complete implementation featuring:
 - ChatDev Assistant for AI-powered development (NEW!)
 
 REQUIREMENTS:
-  pip install torch transformers accelerate bitsandbytes sentencepiece
+  pip install torch transformers accelerate sentencepiece
   pip install pillow pyautogui opencv-python requests beautifulsoup4
 
 USAGE:
@@ -78,7 +78,6 @@ class Config:
     }
     
     USE_GPU = torch.cuda.is_available()
-    USE_4BIT = True
     
     DATA_DIR = Path.home() / ".source_ai_mistral"
     CHAT_FILE = DATA_DIR / "chats.json"
@@ -174,8 +173,7 @@ class ModelLoader:
         self.current_generator = None
         self.current_tokenizer = None
     
-    def load_model(self, model_path: str, use_4bit: bool = Config.USE_4BIT,
-                   use_gpu: bool = Config.USE_GPU) -> Tuple:
+    def load_model(self, model_path: str, use_gpu: bool = Config.USE_GPU) -> Tuple:
         """Load a model with GPU optimization."""
         if model_path in self.generators:
             return self.generators[model_path], self.tokenizers[model_path]
@@ -186,8 +184,7 @@ class ModelLoader:
             from transformers import (
                 AutoModelForCausalLM, 
                 AutoTokenizer, 
-                pipeline, 
-                BitsAndBytesConfig
+                pipeline
             )
             
             # Load tokenizer
@@ -197,29 +194,14 @@ class ModelLoader:
                 use_fast=True
             )
             
-            # GPU configuration
+            # GPU configuration - use standard PyTorch loading
             if use_gpu and torch.cuda.is_available():
-                if use_4bit:
-                    quantization_config = BitsAndBytesConfig(
-                        load_in_4bit=True,
-                        bnb_4bit_compute_dtype=torch.float16,
-                        bnb_4bit_quant_type="nf4",
-                        bnb_4bit_use_double_quant=False
-                    )
-                    model = AutoModelForCausalLM.from_pretrained(
-                        model_path,
-                        torch_dtype=torch.float16,
-                        device_map="auto",
-                        trust_remote_code=True,
-                        quantization_config=quantization_config
-                    )
-                else:
-                    model = AutoModelForCausalLM.from_pretrained(
-                        model_path,
-                        torch_dtype=torch.float16,
-                        device_map="auto",
-                        trust_remote_code=True
-                    )
+                model = AutoModelForCausalLM.from_pretrained(
+                    model_path,
+                    torch_dtype=torch.float16,
+                    device_map="auto",
+                    trust_remote_code=True
+                )
             else:
                 model = AutoModelForCausalLM.from_pretrained(
                     model_path,
@@ -709,7 +691,6 @@ class DataManager:
         return {
             "model": Config.DEFAULT_MODEL,
             "use_gpu": Config.USE_GPU,
-            "use_4bit": Config.USE_4BIT,
         }
     
     def save_config(self, config: Dict):
@@ -888,7 +869,6 @@ CUDA Available: {torch.cuda.is_available()}"""
         info += f"\n\n[CONFIGURATION]"
         info += f"\nCurrent Model: {self.config.get('model', Config.DEFAULT_MODEL)}"
         info += f"\nUse GPU: {self.config.get('use_gpu', Config.USE_GPU)}"
-        info += f"\nUse 4-bit: {self.config.get('use_4bit', Config.USE_4BIT)}"
         
         info += f"\n\n[DATA STORAGE]"
         info += f"\nChats: {Config.CHAT_FILE}"

@@ -24,7 +24,6 @@
 transformers>=4.40.0
 accelerate>=0.27.0
 sentencepiece>=0.1.99
-bitsandbytes>=0.41.0  # For 4-bit quantization
 
 # ============================================================================
 # WEB AND RESEARCH DEPENDENCIES
@@ -68,4 +67,4 @@ pyinstaller>=6.0.0
 
 # For minimal installation (no screen casting):
 # pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-# pip install transformers accelerate bitsandbytes sentencepiece requests beautifulsoup4 Pillow pyautogui opencv-python numpy
+# pip install transformers accelerate sentencepiece requests beautifulsoup4 Pillow pyautogui opencv-python numpy

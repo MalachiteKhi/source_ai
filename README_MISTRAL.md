@@ -52,7 +52,7 @@ source_ai/
 ```bash
 # 1. Install requirements
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-pip install transformers accelerate bitsandbytes sentencepiece
+pip install transformers accelerate sentencepiece
 pip install pillow pyautogui opencv-python requests beautifulsoup4
 
 # 2. Run the AI
@@ -294,7 +294,6 @@ All data is saved to `~/.source_ai_mistral/`:
 - PyTorch with CUDA (for GPU) or CPU-only
 - Transformers
 - Accelerate
-- BitsAndBytes (for 4-bit quantization)
 - Pillow (for image processing)
 - PyAutoGUI (for screenshots)
 - OpenCV (for screen recording)
@@ -304,7 +303,7 @@ All data is saved to `~/.source_ai_mistral/`:
 ```bash
 # Full installation (GPU)
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-pip install transformers accelerate bitsandbytes sentencepiece
+pip install transformers accelerate sentencepiece
 pip install pillow pyautogui opencv-python requests beautifulsoup4
 ```
 

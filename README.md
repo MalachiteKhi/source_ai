@@ -158,7 +158,7 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 python mistral_edition.py --cli
 
 # Or install missing dependencies
-pip install transformers accelerate bitsandbytes
+pip install transformers accelerate
 ```
 
 ### Web Features Not Working
