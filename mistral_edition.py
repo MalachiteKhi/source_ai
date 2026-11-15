@@ -696,6 +696,14 @@ class DataManager:
     def save_config(self, config: Dict):
         with open(self.config_file, 'w', encoding='utf-8') as f:
             json.dump(config, f, indent=2, ensure_ascii=False)
+    
+    def load_knowledge(self) -> Dict:
+        """Load knowledge base from file or return default."""
+        knowledge_file = Config.DATA_DIR / "knowledge.json"
+        if knowledge_file.exists():
+            with open(knowledge_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        return {}
 
 
 # =============================================================================
