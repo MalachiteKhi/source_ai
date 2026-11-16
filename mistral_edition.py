@@ -210,12 +210,11 @@ class ModelLoader:
                     trust_remote_code=True
                 )
             
-            # Create pipeline
+            # Create pipeline (device is handled by device_map in model loading)
             generator = pipeline(
                 "text-generation",
                 model=model,
                 tokenizer=tokenizer,
-                device=0 if use_gpu and torch.cuda.is_available() else -1,
                 max_new_tokens=4096,
                 temperature=0.9,
                 top_p=0.95,
