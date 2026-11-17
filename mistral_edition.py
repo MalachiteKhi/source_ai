@@ -1089,9 +1089,12 @@ Examples:
                 
                 # Add ChatDev tab if available
                 if CHATDEV_AVAILABLE and self.app.chatdev_assistant:
-                    from chatdev_assistant import ChatDevGUIIntegration
-                    chatdev_gui = ChatDevGUIIntegration(self.app, self.app.chatdev_assistant)
-                    self.chatdev_tab = chatdev_gui.add_chatdev_tab(self.notebook)
+                    try:
+                        from chatdev_assistant import ChatDevGUIIntegration
+                        chatdev_gui = ChatDevGUIIntegration(self.app, self.app.chatdev_assistant)
+                        self.chatdev_tab = chatdev_gui.add_chatdev_tab(self.notebook)
+                    except Exception as e:
+                        print(f"ChatDev GUI integration error: {e}")
                 
                 # Set up keybindings
                 self.root.bind('<Control-n>', lambda e: self.new_chat())
@@ -1101,6 +1104,9 @@ Examples:
                 
             except ImportError as e:
                 print(f"GUI error: {e}")
+                self.root = None
+            except Exception as e:
+                print(f"GUI initialization error: {e}")
                 self.root = None
         
         def _configure_style(self):
@@ -1220,7 +1226,17 @@ Examples:
         def run(self):
             """Run the GUI."""
             if self.root:
-                self.root.mainloop()
+                try:
+                    self.root.mainloop()
+                except Exception as e:
+                    # Try to show error in a message box
+                    try:
+                        import tkinter.messagebox as messagebox
+                        messagebox.showerror("GUI Error", f"Failed to start GUI: {e}")
+                    except:
+                        # If we can't show a message box, print to stderr
+                        import sys
+                        print(f"GUI Error: {e}", file=sys.stderr)
 
 
 # =============================================================================
@@ -1244,12 +1260,20 @@ def main():
         try:
             import tkinter as tk
             print("Starting GUI mode...")
-            if hasattr(app, 'gui') and app.gui:
+            if hasattr(app, 'gui') and app.gui and app.gui.root:
                 app.gui.run()
             else:
                 # Create GUI if not already created
                 app.gui = app.GUI(app)
-                app.gui.run()
+                if app.gui.root:
+                    app.gui.run()
+                else:
+                    # GUI initialization failed
+                    try:
+                        import tkinter.messagebox as messagebox
+                        messagebox.showerror("Error", "GUI initialization failed. Please check your Tkinter installation.")
+                    except:
+                        print("Fatal: Cannot run GUI mode")
         except ImportError as e:
             print(f"GUI mode not available: {e}")
             # In windowed mode, we cannot fall back to CLI (no console)
