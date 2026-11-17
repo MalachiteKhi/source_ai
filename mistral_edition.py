@@ -1252,12 +1252,21 @@ def main():
                 app.gui.run()
         except ImportError as e:
             print(f"GUI mode not available: {e}")
-            print("Falling back to CLI mode...")
-            app.run_cli()
+            # In windowed mode, we cannot fall back to CLI (no console)
+            # So we'll show a message box instead
+            try:
+                import tkinter.messagebox as messagebox
+                messagebox.showerror("Error", f"GUI mode not available: {e}\n\nPlease install tkinter.")
+            except:
+                print("Fatal: Cannot run GUI or CLI mode")
         except Exception as e:
             print(f"GUI error: {e}")
-            print("Falling back to CLI mode...")
-            app.run_cli()
+            # In windowed mode, we cannot fall back to CLI (no console)
+            try:
+                import tkinter.messagebox as messagebox
+                messagebox.showerror("Error", f"GUI error: {e}")
+            except:
+                print("Fatal: Cannot run GUI mode")
     else:
         # CLI mode
         app.run_cli()
